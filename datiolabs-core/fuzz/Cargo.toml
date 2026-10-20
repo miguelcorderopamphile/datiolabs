@@ -1,0 +1,30 @@
+[package]
+name = "datiolabs-core-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.datiolabs-core]
+path = ".."
+
+[[bin]]
+name = "ingest_fuzz"
+path = "fuzz_targets/ingest_fuzz.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "full_system_fuzz"
+path = "fuzz_targets/full_system_fuzz.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]

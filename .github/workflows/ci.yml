@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  core:
+    name: Rust core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Tracks main on purpose: the audit is a drift canary. The release pins a tag.
+      - name: Checkout frontend (contract audits)
+        uses: actions/checkout@v4
+        with:
+          repository: miguelcorderopamphile/datiolabs-frontend
+          ref: main
+          path: ui
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - uses: swatinem/rust-cache@v2
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy -p datiolabs-core --all-targets -- -D warnings
+
+      - name: Tests
+        run: cargo test -p datiolabs-core --locked
+
+      - name: Contract audit (TypeScript <-> Rust)
+        run: python3 scripts/auditar_contrato_tauri.py
+
+  windows-installer:
+    name: Windows installer
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+        with:
+          repository: miguelcorderopamphile/datiolabs-frontend
+          path: ui
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './ -> target'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Build frontend
+        working-directory: ui
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install Tauri CLI
+        run: npm install --global @tauri-apps/cli@^2
+
+      - name: Build installer
+        working-directory: datiolabs-ui
+        run: tauri build --target x86_64-pc-windows-msvc
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: datiolabs-windows-installer
+          path: target/**/release/bundle/nsis/*.exe
+          if-no-files-found: error
+          retention-days: 30

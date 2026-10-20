@@ -1,0 +1,37 @@
+# Rust
+/target/
+**/*.rs.bk
+
+# Datos locales
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+datiolabs_db/
+datiolabs_db_kv/
+
+# Entorno
+.env
+.env.*
+!.env.template
+
+# Node / frontend
+node_modules/
+dist/
+.pnpm-debug.log*
+# Frontend repo (datiolabs-frontend), clonado aqui para builds locales
+ui/
+
+# Tauri / builds
+datiolabs-ui/gen/
+*.exe
+*.msi
+
+# Logs
+*.log
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~

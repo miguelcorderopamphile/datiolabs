@@ -1,0 +1,5 @@
+# Third-party bundles kept for offline runtime: not our source.
+*.woff2 binary
+*.png binary
+*.bmp binary
+*.ico binary

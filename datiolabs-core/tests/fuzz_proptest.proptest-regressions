@@ -1,0 +1,9 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc f9e31998411609e84ec6c53abc18da1c933f24f0ee7c6dcfbd4d6469528c0518 # shrinks to rubros = 1, n_productos = 1
+cc 2f114370f3d9c07c1df9ec2a4c25043bb69a469deb9620f65d81a23424f17d6a # shrinks to rubros = 2, lotes = [("_", 0.01, 1)], consumo = 0.02
+cc 0162021681fb94d1f2058f194877db651956ad025027bc4044734e0d9eae106c # shrinks to rubros = 1, skus = ["_", "_"], precios = [0.01, 0.01], stocks = [0, 0]
